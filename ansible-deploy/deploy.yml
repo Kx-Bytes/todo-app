@@ -1,0 +1,32 @@
+---
+- name: Deploy ToDo App using Docker
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Pull latest Docker image
+      community.docker.docker_image:
+        name: kixan123/todo-app
+        tag: latest
+        source: pull
+
+    - name: Stop existing container
+      community.docker.docker_container:
+        name: todo-container
+        state: stopped
+      ignore_errors: yes
+
+    - name: Remove existing container
+      community.docker.docker_container:
+        name: todo-container
+        state: absent
+      ignore_errors: yes
+
+    - name: Run new container
+      community.docker.docker_container:
+        name: todo-container
+        image: kixan123/todo-app:latest
+        ports:
+          - "9001:9001"
+        state: started
+        restart_policy: always
